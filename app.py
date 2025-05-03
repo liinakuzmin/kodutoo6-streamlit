@@ -44,8 +44,7 @@ JSON_PAYLOAD_STR =""" {
 """
 
 def import_geojson():
-    url = "https://raw.githubusercontent.com/nutiteq/geojson-examples/master/maakonnad.geojson"
-    gdf = gpd.read_file(url)
+    gdf = gpd.read_file("maakonnad.geojson")
     return gdf
 
 def import_data():
