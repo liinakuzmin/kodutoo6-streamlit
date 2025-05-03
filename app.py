@@ -107,7 +107,36 @@ def plot(df):
     plt.tight_layout()
     plt.show()
 
+import streamlit as st
+
+st.title("Loomulik iive Eesti maakondades")
+
+# Andmete laadimine
 df = import_data()
-merged_data = gdf.merge(df, left_on='MNIMI', right_on='Maakond') 
-merged_data["Loomulik iive"] = merged_data["Mehed Loomulik iive"] + merged_data["Naised Loomulik iive"]
-plot(get_data_for_year(merged_data, 2017))
+gdf = import_geojson()
+
+# Arvutame loomuliku iibe
+df["Loomulik iive"] = df["Mehed Loomulik iive"] + df["Naised Loomulik iive"]
+
+# Aastavalik kasutajale
+aastad = sorted(df["Aasta"].unique())
+valitud_aasta = st.selectbox("Vali aasta", aastad)
+
+# Valime konkreetse aasta andmed
+aasta_df = get_data_for_year(df, valitud_aasta)
+
+# Teeme maakonnanimed ühtseks
+gdf["Maakond"] = gdf["MNIMI"].str.replace(" maakond", "")
+aasta_df["Maakond"] = aasta_df["Maakond"].str.replace(" maakond", "")
+
+# Ühendame kaardi ja andmed
+merged = gdf.merge(aasta_df, on="Maakond")
+
+# Kuvame tabelina
+st.dataframe(merged[["Maakond", "Loomulik iive"]])
+
+# Joonistame kaardi
+fig, ax = plt.subplots(figsize=(10, 6))
+merged.plot(column="Loomulik iive", cmap="viridis", linewidth=0.8, ax=ax, edgecolor='0.8', legend=True)
+ax.axis("off")
+st.pyplot(fig)
