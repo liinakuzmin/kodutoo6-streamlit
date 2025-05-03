@@ -106,3 +106,8 @@ def plot(df):
     plt.axis('off')  # Hide axis
     plt.tight_layout()
     plt.show()
+
+df = import_data()
+merged_data = gdf.merge(df, left_on='MNIMI', right_on='Maakond') 
+merged_data["Loomulik iive"] = merged_data["Mehed Loomulik iive"] + merged_data["Naised Loomulik iive"]
+plot(get_data_for_year(merged_data, 2017))
